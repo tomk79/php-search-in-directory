@@ -36,6 +36,7 @@
     "autoload": {
         "files": [
             "php/main.php",
+            "php/update_index/index.php",
             "php/simple_html_dom.php"
         ]
     }

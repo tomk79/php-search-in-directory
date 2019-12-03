@@ -15,8 +15,41 @@ class mainTest extends PHPUnit_Framework_TestCase{
 	 * TEST
 	 */
 	public function testMain(){
-		$this->assertEquals( 1, 1 );
+
+		if( is_file( __DIR__.'/testdata/_db.sqlite' ) ){
+			$this->fs->rm( __DIR__.'/testdata/_db.sqlite' );
+		}
 		$this->assertTrue( is_dir(__DIR__.'/testdata') );
+		$this->assertFalse( is_file(__DIR__.'/testdata/_db.sqlite') );
+
+		// DB接続
+		$pdo = new \PDO(
+			'sqlite:'.__DIR__.'/testdata/_db.sqlite',
+			null,
+			null,
+			array()
+		);
+
+		// インスタンス生成
+		$searcher = new \tomk79\searchInDirectory\main(
+			__DIR__.'/testdata/dir/',
+			array(
+				'pdo' => $pdo,
+			)
+		);
+		$this->assertTrue( is_object( $searcher ) );
+		$this->assertTrue( is_object( $searcher->pdo() ) );
+
+		// マイグレーション
+		$searcher->migrate();
+
+		// インデックスを更新する
+		$searcher->update_index();
+
+		// 検索する
+		$result = $searcher->search('text');
+		// var_dump($result);
+		$this->assertEquals( count($result), 1 );
 	}
 
 }
