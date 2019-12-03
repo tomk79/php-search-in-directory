@@ -1,0 +1,42 @@
+{
+    "name": "tomk79/search-in-directory",
+    "description": "指定ディレクトリ内のファイルを検索する。",
+    "keywords": ["search"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tomoya Koyanagi",
+            "email": "tomk79@gmail.com"
+        }
+    ],
+    "scripts":{
+        "test": [
+            "php ./vendor/phpunit/phpunit/phpunit"
+        ] ,
+        "documentation": [
+            "php ./vendor/phpdocumentor/phpdocumentor/bin/phpdoc --title \"tomk79/search-in-directory 0.0.1-alpha.1+dev API Document\" -d \"./php/\" -t \"./docs/phpdoc/\""
+        ]
+    } ,
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "repositories": [
+    ],
+    "require": {
+        "php": ">=5.4.0" ,
+        "ext-mbstring": "*",
+        "ext-pdo": "*",
+        "ext-pdo_sqlite": "*",
+        "tomk79/filesystem": "^1.0.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.1.0" ,
+        "phpdocumentor/phpdocumentor": "^2.9.0",
+        "jms/serializer": "<1.8"
+    },
+    "autoload": {
+        "files": [
+            "php/main.php",
+            "php/simple_html_dom.php"
+        ]
+    }
+}
