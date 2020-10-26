@@ -12,9 +12,6 @@ class main{
 	/** オプション */
 	private $options;
 
-	/** PDO */
-	private $pdo;
-
 	/**
 	 * constructor
 	 * @param string $path_dir 検索対象のディレクトリ
@@ -32,54 +29,16 @@ class main{
 
 		// オプション
 		$options = (array) $options;
-		if( array_key_exists('pdo', $options) ){
-			$this->pdo = $options['pdo'];
-		}
 		$this->options = $options;
 	}
 
 	/**
-	 * PDOを取得
-	 */
-	public function pdo(){
-		return $this->pdo;
-	}
-
-	/**
-	 * 初期化する
-	 */
-	public function migrate(){
-		$result = $this->pdo()->query('CREATE TABLE search_in_directory (
-			filename TEXT,
-			title TEXT,
-			body TEXT,
-			insert_date DATETIME,
-			last_update_date DATETIME
-		);');
-		return true;
-	}
-
-	/**
-	 * インデックスを更新する
-	 */
-	public function update_index(){
-		$updateIndex = new update_index( $this, $this->path_dir );
-		$updateIndex->update();
-	}
-
-	/**
-	 * 検索する
+	 * 検索を実行する
 	 * @param string $keyword キーワード
 	 */
-	public function search( $keyword ){
-		$data = array(
-			'keyword' => "%".$keyword."%",
-		);
-
-		$stmt = $this->pdo()->prepare('SELECT * FROM search_in_directory WHERE body LIKE :keyword ');
-		$stmt->bindParam( ':keyword', $data['keyword'], \PDO::PARAM_STR );
-		$stmt->execute();
-		$result = $stmt->fetchAll();
+	public function start( $keyword, $cond = array() ){
+		$search = new search($this, $this->options, $this->path_dir);
+		$result = $search->search($keyword, $cond);
 		return $result;
 	}
 

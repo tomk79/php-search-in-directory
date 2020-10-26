@@ -16,40 +16,33 @@ class mainTest extends PHPUnit\Framework\TestCase{
 	 */
 	public function test_main(){
 
-		if( is_file( __DIR__.'/testdata/_db.sqlite' ) ){
-			$this->fs->rm( __DIR__.'/testdata/_db.sqlite' );
-		}
 		$this->assertTrue( is_dir(__DIR__.'/testdata') );
-		$this->assertFalse( is_file(__DIR__.'/testdata/_db.sqlite') );
 
-		// DB接続
-		$pdo = new \PDO(
-			'sqlite:'.__DIR__.'/testdata/_db.sqlite',
-			null,
-			null,
-			array()
-		);
+		$matched = array();
 
 		// インスタンス生成
 		$searcher = new \tomk79\searchInDirectory\main(
 			__DIR__.'/testdata/dir/',
 			array(
-				'pdo' => $pdo,
+				'progress' => function( $done, $max ){},
+				'match' => function( $file, $result ) use ( &$matched ){
+					array_push($matched, $file);
+				},
+				'unmatch' => function( $file, $result ){},
+				'error' => function( $file, $error ){},
 			)
 		);
 		$this->assertTrue( is_object( $searcher ) );
-		$this->assertTrue( is_object( $searcher->pdo() ) );
-
-		// マイグレーション
-		$searcher->migrate();
-
-		// インデックスを更新する
-		$searcher->update_index();
 
 		// 検索する
-		$result = $searcher->search('text');
+		$result = $searcher->start(
+			'text',
+			array()
+		);
 		// var_dump($result);
-		$this->assertEquals( count($result), 1 );
+
+
+		$this->assertEquals( count($matched), 1 );
 	}
 
 }
