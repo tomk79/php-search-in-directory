@@ -2,10 +2,10 @@
 /**
  * test for tomk79/search-in-directory
  */
-class mainTest extends PHPUnit_Framework_TestCase{
+class mainTest extends PHPUnit\Framework\TestCase{
 	private $fs;
 
-	public function setup(){
+	protected function setUp() : void{
 		mb_internal_encoding('UTF-8');
 		$this->fs = new tomk79\filesystem();
 	}
@@ -14,7 +14,7 @@ class mainTest extends PHPUnit_Framework_TestCase{
 	/**
 	 * TEST
 	 */
-	public function testMain(){
+	public function test_main(){
 
 		if( is_file( __DIR__.'/testdata/_db.sqlite' ) ){
 			$this->fs->rm( __DIR__.'/testdata/_db.sqlite' );
