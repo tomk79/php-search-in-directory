@@ -7,24 +7,29 @@ namespace tomk79\searchInDirectory;
 class main{
 
 	/** 検索対象ディレクトリ */
-	private $path_dir;
+	private $targets;
 
 	/** オプション */
 	private $options;
 
 	/**
 	 * constructor
-	 * @param string $path_dir 検索対象のディレクトリ
+	 * @param string $target 検索対象のディレクトリ
 	 * @param array $options Options
 	 */
-	public function __construct( $path_dir, $options = array() ){
+	public function __construct( $targets, $options = array() ){
 		// 検索対象ディレクトリ
-		$this->path_dir = $path_dir;
-		if( !is_dir( $this->path_dir ) ){
-			trigger_error( '$path_dir is NOT a directory.' );
+		$this->targets = $targets;
+		if( !is_array($this->targets) ){
+			$this->targets = array( $this->targets );
 		}
-		if( !is_readable( $this->path_dir ) ){
-			trigger_error( '$path_dir is NOT readable.' );
+		foreach( $this->targets as $idx=>$path_dir ){
+			if( !is_dir( $path_dir ) ){
+				trigger_error( '$target['.$idx.'] is NOT a directory.' );
+			}
+			if( !is_readable( $path_dir ) ){
+				trigger_error( '$target['.$idx.'] is NOT readable.' );
+			}
 		}
 
 		// オプション
@@ -37,9 +42,9 @@ class main{
 	 * @param string $keyword キーワード
 	 */
 	public function start( $keyword, $cond = array() ){
-		$search = new search($this, $this->options, $this->path_dir);
-		$result = $search->search($keyword, $cond);
-		return $result;
+		$search = new search($this, $this->options, $this->targets);
+		$search->search($keyword, $cond);
+		return true;
 	}
 
 }

@@ -19,17 +19,31 @@ class mainTest extends PHPUnit\Framework\TestCase{
 		$this->assertTrue( is_dir(__DIR__.'/testdata') );
 
 		$matched = array();
+		$unmatched = array();
+		$total = 0;
+		$done = 0;
 
 		// インスタンス生成
 		$searcher = new \tomk79\searchInDirectory\main(
-			__DIR__.'/testdata/dir/',
 			array(
-				'progress' => function( $done, $max ){},
+				__DIR__.'/testdata/dir/',
+			),
+			array(
+				'progress' => function( $_done, $_max ) use ( &$total, &$done ){
+					$total = $_max;
+					$done = $_done;
+					var_dump($_done.'/'.$_max);
+				},
 				'match' => function( $file, $result ) use ( &$matched ){
+					var_dump('Matched!', $file);
 					array_push($matched, $file);
 				},
-				'unmatch' => function( $file, $result ){},
-				'error' => function( $file, $error ){},
+				'unmatch' => function( $file, $result ) use ( &$unmatched ){
+					array_push($unmatched, $file);
+				},
+				'error' => function( $file, $error ){
+					var_dump($file, $error);
+				},
 			)
 		);
 		$this->assertTrue( is_object( $searcher ) );
@@ -37,12 +51,24 @@ class mainTest extends PHPUnit\Framework\TestCase{
 		// 検索する
 		$result = $searcher->start(
 			'text',
-			array()
+			array(
+				'filter' => array(
+					'/./i',
+				) ,
+				'ignore' => array(
+					'/\.git/',
+				) ,
+				'allowRegExp' => false,
+				'ignoreCase' => false,
+				'matchFileName' => false,
+			)
 		);
 		// var_dump($result);
 
 
 		$this->assertEquals( count($matched), 1 );
+		$this->assertEquals( $total, 6 );
+		$this->assertEquals( $done, 6 );
 	}
 
 }

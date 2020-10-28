@@ -12,7 +12,7 @@ $ composer require tomk79/search-in-directory
 
 ## 更新履歴 - Change log
 
-### tomk79/search-in-directory 0.0.1 (リリース日未定)
+### tomk79/search-in-directory v0.0.1 (リリース日未定)
 
 - Initial Release.
 
