@@ -32,17 +32,18 @@ class mainTest extends PHPUnit\Framework\TestCase{
 				'progress' => function( $_done, $_max ) use ( &$total, &$done ){
 					$total = $_max;
 					$done = $_done;
-					var_dump($_done.'/'.$_max);
+					// var_dump($_done.'/'.$_max);
 				},
 				'match' => function( $file, $result ) use ( &$matched ){
-					var_dump('Matched!', $file);
+					// var_dump('Matched! '.$file);
 					array_push($matched, $file);
 				},
 				'unmatch' => function( $file, $result ) use ( &$unmatched ){
+					// var_dump('Unmatched! '.$file);
 					array_push($unmatched, $file);
 				},
 				'error' => function( $file, $error ){
-					var_dump($file, $error);
+					// var_dump($file, $error);
 				},
 			)
 		);
@@ -53,10 +54,8 @@ class mainTest extends PHPUnit\Framework\TestCase{
 			'text',
 			array(
 				'filter' => array(
-					'/./i',
 				) ,
 				'ignore' => array(
-					'/\.git/',
 				) ,
 				'allowRegExp' => false,
 				'ignoreCase' => false,
@@ -64,11 +63,53 @@ class mainTest extends PHPUnit\Framework\TestCase{
 			)
 		);
 		// var_dump($result);
+		// var_dump($matched);
+		// var_dump($unmatched);
+
 
 
 		$this->assertEquals( count($matched), 1 );
-		$this->assertEquals( $total, 6 );
-		$this->assertEquals( $done, 6 );
+		$this->assertTrue( array_search('/a.html', $matched) !== false );
+		$this->assertEquals( count($unmatched), 3 );
+		$this->assertTrue( array_search('/b.html', $unmatched) !== false );
+		$this->assertTrue( array_search('/test.html', $unmatched) !== false );
+		$this->assertTrue( array_search('/c/d/e/f.html', $unmatched) !== false );
+		$this->assertEquals( $total, 7 );
+		$this->assertEquals( $done, 7 );
+
+
+		// 検索する
+		$matched = array();
+		$unmatched = array();
+		$total = 0;
+		$done = 0;
+		$result = $searcher->start(
+			'Te.t',
+			array(
+				'filter' => array(
+					'/./i',
+				) ,
+				'ignore' => array(
+					'/c\/d/',
+				) ,
+				'allowRegExp' => true,
+				'ignoreCase' => true,
+				'matchFileName' => true,
+			)
+		);
+		// var_dump($result);
+		// var_dump($matched);
+		// var_dump($unmatched);
+
+
+		$this->assertEquals( count($matched), 3 );
+		$this->assertTrue( array_search('/a.html', $matched) !== false );
+		$this->assertTrue( array_search('/b.html', $matched) !== false );
+		$this->assertTrue( array_search('/test.html', $matched) !== false );
+		$this->assertEquals( count($unmatched), 1 );
+		$this->assertTrue( array_search('/c/d/e/f.html', $unmatched) !== false );
+		$this->assertEquals( $total, 7 );
+		$this->assertEquals( $done, 7 );
 	}
 
 }

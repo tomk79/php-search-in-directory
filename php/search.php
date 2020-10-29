@@ -74,6 +74,7 @@ class search{
 		$ls = $this->fs->ls( $this->realpath_current_target.'/'.$path );
 		$this->total = $this->total + count($ls);
 
+
 		foreach( $ls as $basename ){
 			if( is_dir( $this->realpath_current_target.'/'.$path.'/'.$basename ) ){
 				$this->scan_dir_r( $path.'/'.$basename );
@@ -90,25 +91,58 @@ class search{
 	/**
 	 * ファイルをスキャンする
 	 */
-	private function scan_file( $realpath_file ){
-		// var_dump($realpath_file);
-		$body = $this->fs->read_file( $this->realpath_current_target.'/'.$realpath_file );
-
-		$exp = '/'.preg_quote($this->keyword, '/').'/';
+	private function scan_file( $path_file ){
+		// var_dump($path_file);
+		$body = $this->fs->read_file( $this->realpath_current_target.'/'.$path_file );
+		$basename = basename($path_file);
 
 		$result = array(
-			'matched' => true,
+			'matched' => null,
 			'type' => 'file',
 			'count' => 0,
 			'highlights' => array(),
 		);
+
+		foreach( $this->cond['filter'] as $regexpFilter ){
+			if( !preg_match($regexpFilter, $path_file) ){
+				$result['matched'] = false;
+				$this->options['unmatch']( $path_file, $result );
+				return;
+			}
+		}
+
+		foreach( $this->cond['ignore'] as $regexpIgnore ){
+			if( preg_match($regexpIgnore, $path_file) ){
+				$result['matched'] = false;
+				$this->options['unmatch']( $path_file, $result );
+				return;
+			}
+		}
+
+		$exp = '';
+		if( $this->cond['allowRegExp'] ){
+			$exp = '/'.$this->keyword.'/';
+		}else{
+			$exp = '/'.preg_quote($this->keyword, '/').'/';
+		}
+		if( $this->cond['ignoreCase'] ){
+			$exp .= 'i';
+		}
+
 		if( preg_match($exp, $body) ){
 			$result['matched'] = true;
-			$this->options['match']( $realpath_file, $result );
+		}
+		if( $this->cond['matchFileName'] && preg_match($exp, $basename) ){
+			$result['matched'] = true;
+		}
+
+		if( $result['matched'] ){
+			$result['matched'] = true;
+			$this->options['match']( $path_file, $result );
 			$this->hit ++;
 		}else{
 			$result['matched'] = false;
-			$this->options['unmatch']( $realpath_file, $result );
+			$this->options['unmatch']( $path_file, $result );
 		}
 
 		return;
