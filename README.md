@@ -72,7 +72,7 @@ var_dump($done.'/'.$total);
 
 ## 更新履歴 - Change log
 
-### tomk79/search-in-directory v0.0.1 (リリース日未定)
+### tomk79/search-in-directory v0.0.1 (2020年10月29日)
 
 - Initial Release.
 
