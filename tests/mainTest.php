@@ -18,21 +18,16 @@ class mainTest extends PHPUnit\Framework\TestCase{
 
 		$this->assertTrue( is_dir(__DIR__.'/testdata') );
 
-		$matched = array();
-		$unmatched = array();
-		$total = 0;
-		$done = 0;
-
 		// インスタンス生成
 		$searcher = new \tomk79\searchInDirectory\main(
 			array(
 				__DIR__.'/testdata/dir/',
 			),
 			array(
-				'progress' => function( $_done, $_max ) use ( &$total, &$done ){
-					$total = $_max;
+				'progress' => function( $_done, $_total ) use ( &$total, &$done ){
+					$total = $_total;
 					$done = $_done;
-					// var_dump($_done.'/'.$_max);
+					// var_dump($_done.'/'.$_total);
 				},
 				'match' => function( $file, $result ) use ( &$matched ){
 					// var_dump('Matched! '.$file);
@@ -43,13 +38,18 @@ class mainTest extends PHPUnit\Framework\TestCase{
 					array_push($unmatched, $file);
 				},
 				'error' => function( $file, $error ){
-					// var_dump($file, $error);
+					// var_dump($file);
+					// var_dump($error);
 				},
 			)
 		);
 		$this->assertTrue( is_object( $searcher ) );
 
 		// 検索する
+		$matched = array();
+		$unmatched = array();
+		$total = 0;
+		$done = 0;
 		$result = $searcher->start(
 			'text',
 			array(

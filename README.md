@@ -10,6 +10,66 @@ $ composer require tomk79/search-in-directory
 ```
 
 
+## 使い方 - Usage
+
+```php
+$searcher = new \tomk79\searchInDirectory\main(
+    array(
+        // 検索対象とするディレクトリを列挙する
+        '/path/to/target_dir/',
+    ),
+    array(
+        'progress' => function( $_done, $_total ) use ( &$total, &$done ){
+            // 進行状況を受けるコールバック
+            var_dump($_done.'/'.$_total);
+            $total = $_total;
+            $done = $_done;
+        },
+        'match' => function( $file, $result ) use ( &$matched ){
+            // 検索にマッチしたファイルの情報を受けるコールバック
+            var_dump('Matched! '.$file);
+            array_push($matched, $file);
+        },
+        'unmatch' => function( $file, $result ) use ( &$unmatched ){
+            // 検索にマッチしなかったファイルの情報を受けるコールバック
+            var_dump('Unmatched! '.$file);
+            array_push($unmatched, $file);
+        },
+        'error' => function( $file, $error ){
+            // 検索エラー情報を受けるコールバック
+            var_dump($file);
+            var_dump($error);
+        },
+    )
+);
+
+// 検索する
+$matched = array();
+$unmatched = array();
+$total = 0;
+$done = 0;
+$result = $searcher->start(
+    'text', // 検索キーワード
+    array(
+        'filter' => array(
+            // ここに列挙するパターンにマッチしないパスは除外する
+            '/./i',
+        ) ,
+        'ignore' => array(
+            // ここに列挙するパターンにマッチするパスは除外する
+            '/\.git/',
+        ) ,
+        'allowRegExp' => false, // true = 検索キーワード中に正規表現を使えるようにする
+        'ignoreCase' => false, // true = 大文字・小文字を区別しない
+        'matchFileName' => false, // true = ファイル名にもマッチさせる
+    )
+);
+var_dump($matched);
+var_dump($done.'/'.$total);
+```
+
+
+
 ## 更新履歴 - Change log
 
 ### tomk79/search-in-directory v0.0.1 (リリース日未定)
