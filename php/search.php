@@ -10,7 +10,7 @@ class search{
 	private $fs;
 
 	/** Search In Directory Object */
-	private $searcher;
+	private $main;
 
 	/** 検索対象ディレクトリ */
 	private $targets;
@@ -38,33 +38,41 @@ class search{
 
 	/**
 	 * constructor
-	 * @param object $searcher Search In Directory Object
+	 * @param object $main Search In Directory Object
+	 * @param object $statusMgr 状態管理オブジェクト
+	 * @param array $options 初期化オプション
 	 * @param string $target 検索対象のディレクトリ
+	 * @param object $fs Filesystem utility
 	 */
-	public function __construct( $searcher, $options, $targets ){
-		// Search In Directory Object
-		$this->searcher = $searcher;
-
-		// オプション
+	public function __construct( $main, $statusMgr, $options, $targets, $fs ){
+		$this->main = $main;
+		$this->statusMgr = $statusMgr;
 		$this->options = $options;
-
-		// 検索対象ディレクトリ
 		$this->targets = $targets;
-
-		// fs
-		$this->fs = new \tomk79\filesystem();
+		$this->fs = $fs;
 	}
 
 	/**
 	 * 検索を実行する
 	 */
 	public function search( $keyword, $cond = array() ){
+		if( !$this->statusMgr->lock() ){
+			$this->options['error']( null, 'Process is locked.' );
+			return false;
+		}
+
 		$this->keyword = $keyword;
 		$this->cond = $cond;
 		foreach( $this->targets as $target ){
+			if( $this->statusMgr->is_cancel_request() ){
+				// キャンセル要求が出ていたら
+				break;
+			}
 			$this->realpath_current_target = $target;
 			$this->scan_dir_r();
 		}
+		$this->statusMgr->unlock();
+		return true;
 	}
 
 	/**
@@ -74,6 +82,10 @@ class search{
 		$ls = $this->fs->ls( $this->realpath_current_target.'/'.$path );
 		$this->total = $this->total + count($ls);
 
+		if( $this->statusMgr->is_cancel_request() ){
+			// キャンセル要求が出ていたら
+			return;
+		}
 
 		foreach( $ls as $basename ){
 			if( is_dir( $this->realpath_current_target.'/'.$path.'/'.$basename ) ){
@@ -85,7 +97,14 @@ class search{
 			}
 
 			$this->options['progress']($this->done, $this->total);
+
+			if( $this->statusMgr->is_cancel_request() ){
+				// キャンセル要求が出ていたら
+				break;
+			}
 		}
+
+		return;
 	}
 
 	/**

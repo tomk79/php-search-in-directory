@@ -76,6 +76,8 @@ var_dump($done.'/'.$total);
 ### tomk79/search-in-directory v0.1.0 (リリース日未定)
 
 - 初期化オプション `temporary_data_dir` を追加。
+- 重複起動を防止するロック機能を追加。
+- 検索のキャンセル機能を追加。
 
 ### tomk79/search-in-directory v0.0.1 (2020年10月29日)
 

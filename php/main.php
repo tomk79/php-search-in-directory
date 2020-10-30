@@ -15,12 +15,15 @@ class main{
 	/** $fs */
 	private $fs;
 
+	/** $statusMgr */
+	private $statusMgr;
+
 	/**
 	 * constructor
 	 * @param string $target 検索対象のディレクトリ
 	 * @param array $options 初期化オプション
 	 *
-	 * - `temporary_data_dir` => String : ディレクトリのパス
+	 * - `temporary_data_dir` => String : 一時データ保存ディレクトリのパス
 	 * - `progress` => function( $done, $total ) : 進行状況を受けるコールバック関数
 	 * - `match` => function( $file, $result ) : 検索にマッチしたファイルの情報を受けるコールバック関数
 	 * - `unmatch` => function( $file, $result ) : 検索にマッチしなかったファイルの情報を受けるコールバック関数
@@ -53,6 +56,11 @@ class main{
 			$options['temporary_data_dir'] = false;
 		}
 		$this->options = $options;
+
+
+		// --------------------------------------
+		// 状態管理オブジェクト
+		$this->statusMgr = new statusMgr($this, $this->options, $this->fs);
 	}
 
 	/**
@@ -60,9 +68,16 @@ class main{
 	 * @param string $keyword キーワード
 	 */
 	public function start( $keyword, $cond = array() ){
-		$search = new search($this, $this->options, $this->targets);
+		$search = new search($this, $this->statusMgr, $this->options, $this->targets, $this->fs);
 		$search->search($keyword, $cond);
 		return true;
+	}
+
+	/**
+	 * 検索を中止する
+	 */
+	public function cancel(){
+		return $this->statusMgr->cancel_request();
 	}
 
 }

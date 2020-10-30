@@ -37,6 +37,7 @@
         "files": [
             "php/main.php",
             "php/search.php",
+            "php/statusMgr.php",
             "php/simple_html_dom.php"
         ]
     }
