@@ -46,6 +46,9 @@ class statusMgr{
 	 * @return bool ロック成功時に `true`、失敗時に `false` を返します。
 	 */
 	public function lock(){
+		if( !$this->is_temporary_data_dir_available() ){
+			return true;
+		}
 		$lockfilepath = $this->realpath_lockfile;
 		$timeout_limit = 5;
 
@@ -81,6 +84,9 @@ class statusMgr{
 	 * @return bool ロック中の場合に `true`、それ以外の場合に `false` を返します。
 	 */
 	public function is_locked(){
+		if( !$this->is_temporary_data_dir_available() ){
+			return false;
+		}
 		$expire = 60;
 		$lockfilepath = $this->realpath_lockfile;
 		$lockfile_expire = $expire;
@@ -104,6 +110,9 @@ class statusMgr{
 	 * @return bool ロック解除成功時に `true`、失敗時に `false` を返します。
 	 */
 	public function unlock(){
+		if( !$this->is_temporary_data_dir_available() ){
+			return true;
+		}
 		$lockfilepath = $this->realpath_lockfile;
 		$cancel_request_filepath = $this->realpath_cancel_request;
 
@@ -130,6 +139,9 @@ class statusMgr{
 	 * @return bool 成功時に `true`、失敗時に `false` を返します。
 	 */
 	public function touch_lockfile(){
+		if( !$this->is_temporary_data_dir_available() ){
+			return true;
+		}
 		$lockfilepath = $this->realpath_lockfile;
 
 		// PHPのFileStatusCacheをクリア
@@ -148,6 +160,9 @@ class statusMgr{
 	 * @return bool 成功時に `true`、失敗時に `false` を返します。
 	 */
 	public function cancel_request(){
+		if( !$this->is_temporary_data_dir_available() ){
+			return false;
+		}
 		if( !$this->is_locked() ){
 			// 実行中ではないためキャンセルできません。
 			return false;
@@ -164,9 +179,12 @@ class statusMgr{
 	/**
 	 * 検索処理の中断要求が発行されているか確認する
 	 *
-	 * @return bool 成功時に `true`、失敗時に `false` を返します。
+	 * @return bool 中断要求がある時に `true`、ない時に `false` を返します。
 	 */
 	public function is_cancel_request(){
+		if( !$this->is_temporary_data_dir_available() ){
+			return false;
+		}
 		$cancel_request_filepath = $this->realpath_cancel_request;
 
 		clearstatcache();
@@ -175,5 +193,20 @@ class statusMgr{
 			return true;
 		}
 		return false;
+	}
+
+
+	/**
+	 * 一時データディレクトリが利用可能か確認する
+	 * @return bool 利用可能な場合に `true`、利用できない場合に `false` を返します。
+	 */
+	private function is_temporary_data_dir_available(){
+		if( !strlen($this->realpath_temporary_data_dir) ){
+			return false;
+		}
+		if( !is_dir($this->realpath_temporary_data_dir) || !is_writable($this->realpath_temporary_data_dir) ){
+			return false;
+		}
+		return true;
 	}
 }
