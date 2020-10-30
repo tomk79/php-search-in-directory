@@ -24,6 +24,7 @@ class mainTest extends PHPUnit\Framework\TestCase{
 				__DIR__.'/testdata/dir/',
 			),
 			array(
+				'temporary_data_dir' => __DIR__.'/tmpdir/',
 				'progress' => function( $_done, $_total ) use ( &$total, &$done ){
 					$total = $_total;
 					$done = $_done;
