@@ -70,11 +70,11 @@ class mainTest extends PHPUnit\Framework\TestCase{
 
 
 		$this->assertEquals( count($matched), 1 );
-		$this->assertTrue( array_search('/a.html', $matched) !== false );
+		$this->assertTrue( array_search(__DIR__.'/testdata/dir/a.html', $matched) !== false );
 		$this->assertEquals( count($unmatched), 3 );
-		$this->assertTrue( array_search('/b.html', $unmatched) !== false );
-		$this->assertTrue( array_search('/test.html', $unmatched) !== false );
-		$this->assertTrue( array_search('/c/d/e/f.html', $unmatched) !== false );
+		$this->assertTrue( array_search(__DIR__.'/testdata/dir/b.html', $unmatched) !== false );
+		$this->assertTrue( array_search(__DIR__.'/testdata/dir/test.html', $unmatched) !== false );
+		$this->assertTrue( array_search(__DIR__.'/testdata/dir/c/d/e/f.html', $unmatched) !== false );
 		$this->assertEquals( $total, 7 );
 		$this->assertEquals( $done, 7 );
 
@@ -104,11 +104,11 @@ class mainTest extends PHPUnit\Framework\TestCase{
 
 
 		$this->assertEquals( count($matched), 3 );
-		$this->assertTrue( array_search('/a.html', $matched) !== false );
-		$this->assertTrue( array_search('/b.html', $matched) !== false );
-		$this->assertTrue( array_search('/test.html', $matched) !== false );
+		$this->assertTrue( array_search(__DIR__.'/testdata/dir/a.html', $matched) !== false );
+		$this->assertTrue( array_search(__DIR__.'/testdata/dir/b.html', $matched) !== false );
+		$this->assertTrue( array_search(__DIR__.'/testdata/dir/test.html', $matched) !== false );
 		$this->assertEquals( count($unmatched), 1 );
-		$this->assertTrue( array_search('/c/d/e/f.html', $unmatched) !== false );
+		$this->assertTrue( array_search(__DIR__.'/testdata/dir/c/d/e/f.html', $unmatched) !== false );
 		$this->assertEquals( $total, 7 );
 		$this->assertEquals( $done, 7 );
 	}
@@ -172,11 +172,11 @@ class mainTest extends PHPUnit\Framework\TestCase{
 
 
 		$this->assertEquals( count($matched), 1 );
-		$this->assertTrue( array_search('/a.html', $matched) !== false );
+		$this->assertTrue( array_search(__DIR__.'/testdata/dir/a.html', $matched) !== false );
 		$this->assertEquals( count($unmatched), 3 );
-		$this->assertTrue( array_search('/b.html', $unmatched) !== false );
-		$this->assertTrue( array_search('/test.html', $unmatched) !== false );
-		$this->assertTrue( array_search('/c/d/e/f.html', $unmatched) !== false );
+		$this->assertTrue( array_search(__DIR__.'/testdata/dir/b.html', $unmatched) !== false );
+		$this->assertTrue( array_search(__DIR__.'/testdata/dir/test.html', $unmatched) !== false );
+		$this->assertTrue( array_search(__DIR__.'/testdata/dir/c/d/e/f.html', $unmatched) !== false );
 		$this->assertEquals( $total, 7 );
 		$this->assertEquals( $done, 7 );
 

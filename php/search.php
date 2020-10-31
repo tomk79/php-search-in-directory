@@ -112,7 +112,8 @@ class search{
 	 */
 	private function scan_file( $path_file ){
 		// var_dump($path_file);
-		$body = $this->fs->read_file( $this->realpath_current_target.'/'.$path_file );
+		$realpath_file = $this->fs->get_realpath( $this->realpath_current_target.'/'.$path_file );
+		$body = $this->fs->read_file( $realpath_file );
 		$basename = basename($path_file);
 
 		$result = array(
@@ -125,7 +126,7 @@ class search{
 		foreach( $this->cond['filter'] as $regexpFilter ){
 			if( !preg_match($regexpFilter, $path_file) ){
 				$result['matched'] = false;
-				$this->options['unmatch']( $path_file, $result );
+				$this->options['unmatch']( $realpath_file, $result );
 				return;
 			}
 		}
@@ -133,7 +134,7 @@ class search{
 		foreach( $this->cond['ignore'] as $regexpIgnore ){
 			if( preg_match($regexpIgnore, $path_file) ){
 				$result['matched'] = false;
-				$this->options['unmatch']( $path_file, $result );
+				$this->options['unmatch']( $realpath_file, $result );
 				return;
 			}
 		}
@@ -157,11 +158,11 @@ class search{
 
 		if( $result['matched'] ){
 			$result['matched'] = true;
-			$this->options['match']( $path_file, $result );
+			$this->options['match']( $realpath_file, $result );
 			$this->hit ++;
 		}else{
 			$result['matched'] = false;
-			$this->options['unmatch']( $path_file, $result );
+			$this->options['unmatch']( $realpath_file, $result );
 		}
 
 		return;
