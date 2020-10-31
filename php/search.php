@@ -149,11 +149,13 @@ class search{
 			$exp .= 'i';
 		}
 
-		if( preg_match($exp, $body) ){
-			$result['matched'] = true;
-		}
 		if( $this->cond['matchFileName'] && preg_match($exp, $basename) ){
 			$result['matched'] = true;
+			$result['highlights'] = $this->extract_highlight($exp, $basename, $result['highlights']);
+		}
+		if( preg_match($exp, $body) ){
+			$result['matched'] = true;
+			$result['highlights'] = $this->extract_highlight($exp, $body, $result['highlights']);
 		}
 
 		if( $result['matched'] ){
@@ -166,6 +168,32 @@ class search{
 		}
 
 		return;
+	}
+
+	/**
+	 * ハイライトを抽出
+	 */
+	private function extract_highlight( $pattern, $target, $highlights = array() ){
+		$result = preg_match($pattern, $target, $matches, PREG_OFFSET_CAPTURE);
+		$length = strlen($matches[0][0]);
+		$index = $matches[0][1];
+		
+		$index = $index - 20;
+		if( $index < 0 ){
+			$index = 0;
+		}
+		$length = $length + 20 + 20;
+
+		$highlight = substr($target, $index, $length);
+
+		$highlight = preg_replace($pattern, '<<<<<<$0>>>>>>', $highlight);
+		$highlight = htmlspecialchars($highlight);
+		$highlight = preg_replace('/\r\n|\r|\n/', ' ', $highlight);
+		$highlight = preg_replace('/'.preg_quote(htmlspecialchars('<<<<<<'), '/').'/', '<strong>', $highlight);
+		$highlight = preg_replace('/'.preg_quote(htmlspecialchars('>>>>>>'), '/').'/', '</strong>', $highlight);
+		array_push($highlights, $highlight);
+
+		return $highlights;
 	}
 
 }
